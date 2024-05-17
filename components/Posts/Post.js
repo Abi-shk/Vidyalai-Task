@@ -12,6 +12,8 @@ const PostContainer = styled.div(() => ({
 
 const CarouselContainer = styled.div(() => ({
   position: 'relative',
+  display: 'flex',
+  alignItems: 'center'
 }));
 
 const Carousel = styled.div(() => ({
@@ -46,7 +48,7 @@ const Content = styled.div(() => ({
 
 const Button = styled.button(() => ({
   position: 'absolute',
-  bottom: 0,
+  // bottom: '42%',
   backgroundColor: 'rgba(255, 255, 255, 0.5)',
   border: 'none',
   color: '#000',
@@ -63,13 +65,51 @@ const NextButton = styled(Button)`
   right: 10px;
 `;
 
+const AvatarContainer = styled.button(() => ({
+  width: '100%',
+  height: '65px',
+  display: 'flex',
+  alignItems: 'center',
+  gap: "10px",
+  border: 'none',
+  backgroundColor: 'transparent',
+  marginLeft: '3px'
+}));
+
+const Avatar = styled.button(() => ({
+  height: "50px",
+  width: "50px",
+  aspectRatio: 1,
+  borderRadius: "50%",
+  backgroundColor: "gray",
+  fontSize: "20px",
+  fontWeight: "800",
+  color: "white",
+  border: 'none'
+}))
+
+const UserDetails = styled.div(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems:'start',
+}))
+
+const UserName = styled.h3(() => ({
+  color: 'black',
+  fontWeight: "800",
+}))
+const Email = styled.p(() => ({
+  color: 'black',
+}))
+
 const Post = ({ post }) => {
   const carouselRef = useRef(null);
 
   const handleNextClick = () => {
     if (carouselRef.current) {
       carouselRef.current.scrollBy({
-        left: 50,
+        left: 300,
         behavior: 'smooth',
       });
     }
@@ -78,7 +118,7 @@ const Post = ({ post }) => {
   const handlePrevClick = () => {
     if (carouselRef.current) {
       carouselRef.current.scrollBy({
-        left: -70,
+        left: -300,
         behavior: 'smooth',
       });
     }
@@ -86,6 +126,15 @@ const Post = ({ post }) => {
 
   return (
     <PostContainer>
+      <AvatarContainer>
+        <Avatar>
+          {post?.userData?.name?.split(" ")[0][0] + post?.userData?.name?.split(" ")[1][0]}
+        </Avatar>
+        <UserDetails>
+          <UserName>{post?.userData?.name}</UserName>
+          {post?.userData?.email}
+        </UserDetails>
+      </AvatarContainer>
       <CarouselContainer>
         <Carousel ref={carouselRef}>
           {post.images.map((image, index) => (

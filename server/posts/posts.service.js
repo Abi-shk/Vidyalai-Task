@@ -8,13 +8,12 @@ const axios = require('axios').default;
  * @param {number} [params.limit=10] - The maximum number of posts to fetch.
  * @returns {Promise<Array>} - A promise that resolves to an array of posts.
  */
-async function fetchPosts(params) {
-  const { start = 0, limit = 10 } = params || {};
+async function fetchPosts({cursor,limit}) {
   const { data: posts } = await axios.get(
     'https://jsonplaceholder.typicode.com/posts?limit',
     {
       params: {
-        _start: start,
+        _start: cursor,
         _limit: limit,
       },
     },
@@ -23,4 +22,20 @@ async function fetchPosts(params) {
   return posts;
 }
 
-module.exports = { fetchPosts };
+const fetchImages = async (postId) => {
+  try {
+    const res = await axios.get(`https://jsonplaceholder.typicode.com/albums/${postId}/photos`,
+      {
+        params:{
+          _start:0,
+          _limit:5
+        }
+      }
+    )
+    return res.data
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+module.exports = { fetchPosts, fetchImages };

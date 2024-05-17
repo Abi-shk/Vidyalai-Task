@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import Post from './Post';
 import Container from '../common/Container';
-import useWindowWidth from '../hooks/useWindowWidth';
+import { useWindowWidth } from '../context/WidthContext';
 
 const PostListContainer = styled.div(() => ({
   display: 'flex',
@@ -34,39 +34,41 @@ const LoadMoreButton = styled.button(() => ({
 
 export default function Posts() {
   const [posts, setPosts] = useState([]);
+  const [cursor, setCursor] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [nomoreData, setNomoreData] = useState(false);
 
   const { isSmallerDevice } = useWindowWidth();
 
   useEffect(() => {
-    const fetchPost = async () => {
-      const { data: posts } = await axios.get('/api/v1/posts', {
-        params: { start: 0, limit: isSmallerDevice ? 5 : 10 },
-      });
-      setPosts(posts);
-    };
-
     fetchPost();
   }, [isSmallerDevice]);
 
-  const handleClick = () => {
-    setIsLoading(true);
-
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
+  const fetchPost = async () => {
+    setIsLoading(true)
+    const { data: data } = await axios.get('/api/v1/posts', {
+      params: { start: cursor, limit: isSmallerDevice ? 6 : 12 },
+    });
+    setPosts([...posts, ...data]);
+    if (!isSmallerDevice && data.length < 12) {
+      setNomoreData(true)
+    } else if (isSmallerDevice && data.length < 6) {
+      setNomoreData(true)
+    }
+    setCursor(isSmallerDevice ? cursor + 6 : cursor + 12);
+    setIsLoading(false);
   };
 
   return (
     <Container>
       <PostListContainer>
         {posts.map(post => (
-          <Post post={post} />
+          <Post key={post.id} post={post} />
         ))}
       </PostListContainer>
 
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <LoadMoreButton onClick={handleClick} disabled={isLoading}>
+        <LoadMoreButton hidden={nomoreData} onClick={fetchPost} disabled={isLoading}>
           {!isLoading ? 'Load More' : 'Loading...'}
         </LoadMoreButton>
       </div>
